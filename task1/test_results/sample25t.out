@@ -1,0 +1,26 @@
+	"NAME" 	19
+	"program" 	1
+	"var" 	1
+	"begin" 	1
+	"end" 	1
+	"char" 	3
+	"integer" 	8
+	"boolean" 	2
+	"writeln" 	3
+	"true" 	1
+	"false" 	1
+	"NUMBER" 	1
+	"STRING" 	1
+	"(" 	15
+	")" 	15
+	":=" 	4
+	"." 	1
+	"," 	6
+	":" 	3
+	";" 	14
+	"write" 	3
+	"Identifier" "booly"	4
+	"Identifier" "boolx"	4
+	"Identifier" "int"	5
+	"Identifier" "ch"	5
+	"Identifier" "IfstTC"	1

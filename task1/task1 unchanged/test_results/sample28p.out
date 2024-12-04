@@ -1,0 +1,15 @@
+	"NAME" 	5
+	"program" 	1
+	"begin" 	3
+	"end" 	3
+	"procedure" 	2
+	"call" 	2
+	"writeln" 	2
+	"STRING" 	2
+	"(" 	2
+	")" 	2
+	"." 	1
+	";" 	6
+	"Identifier" "q"	2
+	"Identifier" "p"	2
+	"Identifier" "sample28p"	1

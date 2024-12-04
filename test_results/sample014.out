@@ -1,0 +1,17 @@
+Line:   32 ERROR: Unexpected token after '/'..
+Line:   32 ERROR: Expected ';' between statements.
+Line:   32 ERROR: Failed to parse compound statement after 'then'.
+Line:   32 ERROR: Failed to parse conditional statement.
+Line:   32 ERROR: Failed to parse single-line statement after 'else'.
+Line:   32 ERROR: Failed to parse conditional statement.
+Line:   32 ERROR: Failed to parse single-line statement after 'else'.
+Line:   32 ERROR: Failed to parse conditional statement.
+Line:   32 ERROR: Failed to parse single-line statement after 'else'.
+Line:   32 ERROR: Failed to parse conditional statement.
+Line:   32 ERROR: Failed to parse single-line statement after 'else'.
+Line:   32 ERROR: Failed to parse conditional statement.
+Line:   32 ERROR: Failed to parse statement.
+Line:   32 ERROR: Failed to parse compound statement after 'do'.
+Line:   32 ERROR: Failed to parse iteration statement.
+Line:   32 ERROR: Failed to parse statement.
+Line:   32 ERROR: Failed to parse compound statement in block.

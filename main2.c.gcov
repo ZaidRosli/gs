@@ -1,0 +1,81 @@
+        -:    0:Source:main2.c
+        -:    1://main.c
+        -:    2:#include "pretty-print.h" //macam main.c
+        -:    3:
+        -:    4:/* keyword list */
+        -:    5:struct KEY key[KEYWORDSIZE] = {
+        -:    6:  {"and", TAND},         {"array", TARRAY},     {"begin", TBEGIN},
+        -:    7:  {"boolean", TBOOLEAN}, {"break", TBREAK},     {"call", TCALL},
+        -:    8:  {"char", TCHAR},       {"div", TDIV},         {"do", TDO},
+        -:    9:  {"else", TELSE},       {"end", TEND},         {"false", TFALSE},
+        -:   10:  {"if", TIF},           {"integer", TINTEGER}, {"not", TNOT},
+        -:   11:  {"of", TOF},           {"or", TOR},           {"procedure", TPROCEDURE},
+        -:   12:  {"program", TPROGRAM}, {"read", TREAD},       {"readln", TREADLN},
+        -:   13:  {"return", TRETURN},   {"then", TTHEN},       {"true", TTRUE},
+        -:   14:  {"var", TVAR},         {"while", TWHILE},     {"write", TWRITE},
+        -:   15:  {"writeln", TWRITELN}};
+        -:   16:
+        -:   17:/* string of each token */
+        -:   18:char *tokenstr[NUMOFTOKEN + 1] = {
+        -:   19:        "",
+        -:   20:        "NAME", "program", "var", "array", "of", "begin", "end", "if", "then",
+        -:   21:        "else", "procedure", "return", "call", "while", "do", "not", "or",
+        -:   22:        "div", "and", "char", "integer", "boolean", "readln", "writeln", "true",
+        -:   23:        "false", "NUMBER", "STRING", "+", "-", "*", "=", "<>", "<", "<=", ">",
+        -:   24:        ">=", "(", ")", "[", "]", ":=", ".", ",", ":", ";", "read", "write", "break"
+        -:   25:};
+        -:   26:
+function main called 1 returned 100% blocks executed 67%
+        1:   27:int main(int nc, char *np[]) {
+        -:   28:    FILE *fp;
+        1:   29:    int is_success = 0;
+        -:   30:
+        -:   31:    /* End without argument */
+        1:   32:    if (nc < 2) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   33:        fprintf(stderr, "File name id not given.\n");
+call    0 never executed
+    #####:   34:        return EXIT_FAILURE;
+        -:   35:    }
+        -:   36:
+        -:   37:    /* End if file can not be opened */
+        1:   38:    if (init_scan(np[1], &fp) < 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   39:        fprintf(stderr, "File %s can not open.\n", np[1]);
+call    0 never executed
+    #####:   40:        return EXIT_FAILURE;
+        -:   41:    }
+        -:   42:
+        -:   43:    /* Prefetch one token */
+        1:   44:    token = scan(fp);
+call    0 returned 100%
+        -:   45:
+        -:   46:    /* Parse program */
+        1:   47:    is_success = parse_program(fp);
+call    0 returned 100%
+        -:   48:
+        1:   49:    end_scan(fp);
+call    0 returned 100%
+        -:   50:
+        1:   51:    if (is_success == NORMAL) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   52:        return EXIT_SUCCESS;
+        -:   53:    } else {
+    #####:   54:        return EXIT_FAILURE;
+        -:   55:    }
+        -:   56:}
+        -:   57:
+        -:   58:/* Display error message */  //tukar int instead of void
+function error called 0 returned 0% blocks executed 0%
+    #####:   59:int error(char *mes) {
+    #####:   60:    fprintf(stderr, "Line: %4d ERROR: %s.\n", get_linenum(), mes);
+call    0 never executed
+call    1 never executed
+    #####:   61:    return ERROR;
+        -:   62:}
+        -:   63:
+        -:   64:

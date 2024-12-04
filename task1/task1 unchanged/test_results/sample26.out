@@ -1,0 +1,26 @@
+	"NAME" 	16
+	"program" 	1
+	"var" 	1
+	"begin" 	2
+	"end" 	2
+	"while" 	1
+	"do" 	1
+	"integer" 	1
+	"readln" 	1
+	"writeln" 	1
+	"NUMBER" 	3
+	"STRING" 	2
+	"+" 	1
+	"-" 	1
+	">" 	1
+	"(" 	2
+	")" 	2
+	":=" 	4
+	"." 	1
+	"," 	5
+	":" 	1
+	";" 	7
+	"Identifier" "sum"	5
+	"Identifier" "i"	6
+	"Identifier" "n"	4
+	"Identifier" "whilest"	1

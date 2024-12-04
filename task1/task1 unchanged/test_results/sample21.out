@@ -1,0 +1,13 @@
+	"NAME" 	3
+	"program" 	1
+	"var" 	1
+	"begin" 	1
+	"end" 	1
+	"integer" 	1
+	"NUMBER" 	1
+	":=" 	1
+	"." 	1
+	":" 	1
+	";" 	2
+	"Identifier" "n"	2
+	"Identifier" "assigninteger"	1

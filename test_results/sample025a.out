@@ -1,0 +1,6 @@
+Line:    8 ERROR: Expected ')' to close output statement.
+Line:    8 ERROR: Failed to parse output statement.
+Line:    8 ERROR: Failed to parse single-line statement after 'then'.
+Line:    8 ERROR: Failed to parse conditional statement.
+Line:    8 ERROR: Failed to parse statement.
+Line:    8 ERROR: Failed to parse compound statement in block.

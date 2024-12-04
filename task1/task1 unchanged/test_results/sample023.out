@@ -1,0 +1,15 @@
+	"NAME" 	5
+	"program" 	1
+	"var" 	1
+	"begin" 	1
+	"end" 	1
+	"char" 	1
+	"STRING" 	2
+	":=" 	2
+	"." 	1
+	"," 	1
+	":" 	1
+	";" 	4
+	"Identifier" "y"	2
+	"Identifier" "x"	2
+	"Identifier" "assignchar"	1

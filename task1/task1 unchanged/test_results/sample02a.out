@@ -1,0 +1,12 @@
+	"NAME" 	1
+	"program" 	1
+	"begin" 	1
+	"end" 	1
+	"writeln" 	1
+	"STRING" 	1
+	"(" 	1
+	")" 	1
+	"." 	1
+	";" 	22
+	"break" 	1
+	"Identifier" "TeaBreak"	1

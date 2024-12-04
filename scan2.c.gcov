@@ -1,0 +1,715 @@
+        -:    0:Source:scan2.c
+        -:    1://scan.c
+        -:    2:
+        -:    3:#include "pretty-print.h"
+        -:    4:
+        -:    5:// Global Variables
+        -:    6:char string_attr[MAXSTRSIZE];
+        -:    7:int num_attr;          // Attribute for numbers
+        -:    8:char cbuf = '\0';     // Current character buffer
+        -:    9:int linenum = 0;      // Current line number
+        -:   10://int indent_level = 0;
+        -:   11:/* ====================== Initialization and Utility Functions ====================== */
+        -:   12:
+        -:   13:/* Call before scanning, open the file to scan
+        -:   14: * Success: 0; Failed: -1 */
+function init_scan called 1 returned 100% blocks executed 83%
+        1:   15:int init_scan(char *filename, FILE **fp) {
+        1:   16:    *fp = fopen(filename, "r"); // Open the file for reading
+call    0 returned 100%
+        1:   17:    if (*fp == NULL) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   18:        return -1; // Return error if file cannot be opened
+        -:   19:    }
+        -:   20:
+        1:   21:    linenum = 1; // Initialize line number
+        1:   22:    cbuf = (char) fgetc(*fp); // Read the first character
+call    0 returned 100%
+        1:   23:    return 0; // Successful initialization
+        -:   24:}
+        -:   25:
+        -:   26:/* Initialize char array with '\0' */
+function init_char_array called 231 returned 100% blocks executed 100%
+      231:   27:void init_char_array(char *array, int arraylength) {
+   236775:   28:    for (int i = 0; i < arraylength; i++) {
+branch  0 taken 100%
+branch  1 taken 1% (fallthrough)
+   236544:   29:        array[i] = '\0'; // Set each character to null
+        -:   30:    }
+      231:   31:}
+        -:   32:
+        -:   33:/* Initialize int type array with 0 */
+function init_int_array called 0 returned 0% blocks executed 0%
+    #####:   34:void init_int_array(int *array, int arraylength) {
+    #####:   35:    for (int i = 0; i < arraylength; i++) {
+branch  0 never executed
+branch  1 never executed
+    #####:   36:        array[i] = 0; // Set each integer to zero
+        -:   37:    }
+    #####:   38:}
+        -:   39:
+        -:   40:
+        -:   41:/* ====================== Task2 ====================== */
+        -:   42:/*
+        -:   43:void print_indent() {
+        -:   44:    for (int i = 0; i < indent_level; i++) {
+        -:   45:    	//printf("Debug: i = %d, indent_level = %d\n", i, indent_level);
+        -:   46:        printf("\t"); // 4 spaces per level
+        -:   47:    }
+        -:   48:}
+        -:   49:*/
+        -:   50:
+function print_indent called 63 returned 100% blocks executed 100%
+       63:   51:void print_indent(int level) {
+      404:   52:    for (int i = 0; i < level; i++) {
+branch  0 taken 84%
+branch  1 taken 16% (fallthrough)
+      341:   53:        printf("    "); // Print 4 spaces for each indentation level
+call    0 returned 100%
+        -:   54:    }
+       63:   55:}
+        -:   56:
+        -:   57:
+function print_token called 102 returned 100% blocks executed 100%
+      102:   58:void print_token(const char *token, int newline_after) {
+      102:   59:    printf("%s", token);
+call    0 returned 100%
+      102:   60:    if (newline_after) {
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+        4:   61:        printf("\n");
+call    0 returned 100%
+       98:   62:    } else if (strcmp(token, ";") != 0 && strcmp(token, ".") != 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+       98:   63:        printf(" ");
+call    0 returned 100%
+        -:   64:    }
+      102:   65:}
+        -:   66:
+        -:   67:/*
+        -:   68:void print_token(const char *token, int newline_after) {
+        -:   69:    // Punctuation or symbols that do not need a preceding space
+        -:   70:    if (strcmp(token, ";") == 0 || strcmp(token, ".") == 0 || strcmp(token, ",") == 0 || strcmp(token, ")") == 0) {
+        -:   71:        printf("%s", token); // Print punctuation immediately after the last token
+        -:   72:    }
+        -:   73:    // Handle opening parentheses or other cases explicitly without space
+        -:   74:    else if (strcmp(token, "(") == 0) {
+        -:   75:        printf("%s", token);
+        -:   76:    }
+        -:   77:    // Regular tokens or keywords
+        -:   78:    else {
+        -:   79:        printf("%s", token); // Print the token
+        -:   80:        if (newline_after == 0) {
+        -:   81:            printf(" "); // Add space only when not followed by a newline
+        -:   82:        }
+        -:   83:    }
+        -:   84:
+        -:   85:    // Handle newlines if requested
+        -:   86:    if (newline_after) {
+        -:   87:        printf("\n");
+        -:   88:    }
+        -:   89:}
+        -:   90:*/
+        -:   91:
+        -:   92:/* ====================== Helper Functions ====================== */
+        -:   93:
+        -:   94:/* Check whether the character is alphabetic */
+function is_check_alphabet called 481 returned 100% blocks executed 100%
+      481:   95:int is_check_alphabet(char c) {
+      481:   96:    return ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a));
+branch  0 taken 79% (fallthrough)
+branch  1 taken 21%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+branch  4 taken 79% (fallthrough)
+branch  5 taken 21%
+branch  6 taken 100% (fallthrough)
+branch  7 taken 0%
+        -:   97:}
+        -:   98:
+        -:   99:/* Confirm whether the character is a number */
+function is_check_number called 294 returned 100% blocks executed 100%
+      294:  100:int is_check_number(char c) {
+      294:  101:    return (c >= 0x30 && c <= 0x39);
+branch  0 taken 64% (fallthrough)
+branch  1 taken 36%
+branch  2 taken 29% (fallthrough)
+branch  3 taken 71%
+        -:  102:}
+        -:  103:
+        -:  104:/* Confirm whether the character is a symbol */
+function is_check_symbol called 231 returned 100% blocks executed 100%
+      231:  105:int is_check_symbol(char c) {
+      231:  106:    return ((c >= 0x28 && c <= 0x2e) || (c >= 0x3a && c <= 0x3e) ||
+branch  0 taken 86% (fallthrough)
+branch  1 taken 14%
+branch  2 taken 82% (fallthrough)
+branch  3 taken 18%
+branch  4 taken 62% (fallthrough)
+branch  5 taken 38%
+branch  6 taken 100% (fallthrough)
+branch  7 taken 0%
+      462:  107:            c == 0x5b || c == 0x5d);
+branch  0 taken 97% (fallthrough)
+branch  1 taken 3%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+        -:  108:}
+        -:  109:
+        -:  110:/* Check if the token size exceeds the maximum, return -1 if it does */
+function is_check_token_size called 434 returned 100% blocks executed 60%
+      434:  111:int is_check_token_size(int i) {
+      434:  112:    if (i >= MAXSTRSIZE) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  113:        error("one token is too long.");
+call    0 never executed
+    #####:  114:        return -1;
+        -:  115:    }
+      434:  116:    return 1; // Return success
+        -:  117:}
+        -:  118:
+function is_relational_operator called 62 returned 100% blocks executed 100%
+       62:  119:int is_relational_operator(int token) {
+       62:  120:    return (token == TEQUAL || token == TNOTEQ || token == TLE ||
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 87% (fallthrough)
+branch  3 taken 13%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0%
+      124:  121:            token == TLEEQ || token == TGR || token == TGREQ);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 78% (fallthrough)
+branch  3 taken 22%
+branch  4 taken 19% (fallthrough)
+branch  5 taken 81%
+        -:  122:}
+        -:  123:
+function is_multiplicative_operator called 58 returned 100% blocks executed 86%
+       58:  124:int is_multiplicative_operator(int token) {
+      58*:  125:    return (token == TSTAR || token == TDIV || token == TAND);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+branch  4 taken 0% (fallthrough)
+branch  5 taken 100%
+        -:  126:}
+        -:  127:
+        -:  128:
+        -:  129:/* ====================== Separator and Comment Handling Functions ====================== */
+        -:  130:
+        -:  131:/* Skip separators (whitespace, tabs, newlines, and comments) */
+        -:  132:
+function skip_separator called 694 returned 100% blocks executed 79%
+      694:  133:int skip_separator(char c, FILE *fp) {
+      694:  134:    switch (c) {
+branch  0 taken 61%
+branch  1 taken 5%
+branch  2 taken 0%
+branch  3 taken 1%
+branch  4 taken 1%
+branch  5 taken 33%
+      421:  135:        case '\t': // Tab
+        -:  136:        case '\v': // Vertical tab
+        -:  137:        case 0x20: // Space
+      421:  138:            cbuf = (char) fgetc(fp); // Read next character
+call    0 returned 100%
+      421:  139:            return 1; // Return 1 for whitespace
+       38:  140:        case '\r': // Carriage return
+       38:  141:            cbuf = (char) fgetc(fp);
+call    0 returned 100%
+        -:  142:            // Only increment linenum if followed by '\n'
+       38:  143:            if (cbuf == '\n') {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       38:  144:                cbuf = (char) fgetc(fp);
+call    0 returned 100%
+       38:  145:                linenum++;
+        -:  146:            }
+       38:  147:            return 1; // Handle but do not increment
+    #####:  148:        case '\n': // New line
+    #####:  149:            linenum++; // Increment line number
+    #####:  150:            cbuf = (char) fgetc(fp);
+call    0 never executed
+    #####:  151:            return 1; // Return 1 for new line
+        2:  152:        case '{': // Start of single-line comment
+        2:  153:            return skip_comment(fp, 2);
+call    0 returned 100%
+        2:  154:        case '/': // Start of multi-line comment
+        2:  155:            if ((cbuf = (char) fgetc(fp)) == '*') {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+        2:  156:                return skip_comment(fp, 3);
+call    0 returned 100%
+        -:  157:            }
+    #####:  158:            error("Unexpected token after '/'.");
+call    0 never executed
+    #####:  159:            return -1; // Return error
+      231:  160:        default:
+      231:  161:            return 0; // Not a separator
+        -:  162:    }
+        -:  163:}
+        -:  164:
+        -:  165:
+        -:  166:/*
+        -:  167:int skip_separator(char c, FILE *fp) {
+        -:  168:    switch (c) {
+        -:  169:        case '\t': // Tab
+        -:  170:        case '\v': // Vertical tab
+        -:  171:        case 0x20: // Space
+        -:  172:            cbuf = (char) fgetc(fp); // Read next character
+        -:  173:            return feof(fp) ? -1 : 1; // Return error if EOF is reached
+        -:  174:        case '\r': // Carriage return
+        -:  175:            cbuf = (char) fgetc(fp);
+        -:  176:            if (cbuf == '\n') {
+        -:  177:                cbuf = (char) fgetc(fp);
+        -:  178:                linenum++;
+        -:  179:            }
+        -:  180:            return feof(fp) ? -1 : 1; // Handle EOF
+        -:  181:        case '\n': // New line
+        -:  182:            linenum++; // Increment line number
+        -:  183:            cbuf = (char) fgetc(fp);
+        -:  184:            return feof(fp) ? -1 : 1; // Handle EOF
+        -:  185:        case '{': // Single-line comment
+        -:  186:            return skip_comment(fp, 2);
+        -:  187:        case '/': // Multi-line comment
+        -:  188:            if ((cbuf = (char) fgetc(fp)) == '*') {
+        -:  189:                return skip_comment(fp, 3);
+        -:  190:            }
+        -:  191:            error("Unexpected token after '/'.");
+        -:  192:            return -1; // Return error
+        -:  193:        default:
+        -:  194:            return 0; // Not a separator
+        -:  195:    }
+        -:  196:}
+        -:  197:*/
+        -:  198:
+        -:  199:/* Skip comments */
+function skip_comment called 4 returned 100% blocks executed 67%
+        4:  200:int skip_comment(FILE *fp, int sep_type) {
+        4:  201:    int start_line = linenum; // Track the starting line of the comment
+      115:  202:    while ((cbuf = (char) fgetc(fp)) != EOF) {
+call    0 returned 100%
+branch  1 taken 100%
+branch  2 taken 0% (fallthrough)
+      115:  203:        if (sep_type == 2 && cbuf == '}') {
+branch  0 taken 65% (fallthrough)
+branch  1 taken 35%
+branch  2 taken 3% (fallthrough)
+branch  3 taken 97%
+        2:  204:            cbuf = (char) fgetc(fp);
+call    0 returned 100%
+        2:  205:            return 2; // End of single-line comment
+      113:  206:        } else if (sep_type == 3 && cbuf == '*') {
+branch  0 taken 35% (fallthrough)
+branch  1 taken 65%
+branch  2 taken 5% (fallthrough)
+branch  3 taken 95%
+        2:  207:            if ((cbuf = (char) fgetc(fp)) == '/') {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+        2:  208:                cbuf = (char) fgetc(fp);
+call    0 returned 100%
+        2:  209:                return 3; // End of multi-line comment
+        -:  210:            }
+        -:  211:        }
+        -:  212:        // Count newlines for linenum
+      111:  213:        if (cbuf == '\r') {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  214:            if ((cbuf = (char) fgetc(fp)) == '\n') {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  215:                linenum++;
+        -:  216:            } else {
+    #####:  217:                ungetc(cbuf, fp); // Put character back if not newline
+call    0 never executed
+    #####:  218:                linenum++;
+        -:  219:            }
+      111:  220:        } else if (cbuf == '\n') {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  221:            linenum++; // Increment line number
+        -:  222:        }
+        -:  223:    }
+        -:  224:
+        -:  225:    // Print a message for unclosed comments instead of raising an error
+    #####:  226:    printf("This is an unclosed comment started at line %d\n", start_line);
+call    0 never executed
+    #####:  227:    return 1; // Return a value indicating an unclosed comment
+        -:  228:}
+        -:  229:/* ====================== Token Identification Functions ====================== */
+        -:  230:
+function identify_keyword called 102 returned 100% blocks executed 100%
+      102:  231:int identify_keyword(const char *tokenstr) {
+      102:  232:    if (strlen(tokenstr) <= MAXKEYWORDLENGTH) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+     2242:  233:        for (int i = 0; i < KEYWORDSIZE; i++) {
+branch  0 taken 98%
+branch  1 taken 2% (fallthrough)
+     2194:  234:            if (strcmp(tokenstr, key[i].keyword) == 0) {
+branch  0 taken 2% (fallthrough)
+branch  1 taken 98%
+       54:  235:                return key[i].keytoken; // Return token code for keyword
+        -:  236:            }
+        -:  237:        }
+        -:  238:    }
+       48:  239:    return -1; // Return -1 if not found
+        -:  240:}
+        -:  241:
+        -:  242:/* Store name in string_attr and return TNAME */
+        -:  243:/*
+        -:  244:int identify_name(const char *tokenstr) {
+        -:  245:    //printf("Debug: Identifying name '%s'\n", tokenstr);
+        -:  246:    init_char_array(string_attr, MAXSTRSIZE);
+        -:  247:    snprintf(string_attr, MAXSTRSIZE, "%s", tokenstr); // Copy token to string_attr
+        -:  248:   // printf("Debug: Stored in string_attr '%s'\n", string_attr);
+        -:  249:    return TNAME; // Return TNAME
+        -:  250:}
+        -:  251:*/
+        -:  252:
+function identify_name called 48 returned 100% blocks executed 67%
+       48:  253:int identify_name(const char *name) {
+        -:  254:    // Validate the input
+       48:  255:    if (name == NULL || strlen(name) == 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  256:        fprintf(stderr, "Error: Invalid name input.\n");
+call    0 never executed
+    #####:  257:        return ERROR;
+        -:  258:    }
+        -:  259:
+        -:  260:    // Copy the name into the TNAME slot in tokenstr
+       48:  261:    snprintf(string_attr, MAXSTRSIZE, "%s", name); // Store the name in string_attr for backward compatibility
+       48:  262:    tokenstr[TNAME] = strdup(name); // Dynamically store the name in tokenstr at the TNAME index
+        -:  263:
+        -:  264:    // Return the TNAME token
+       48:  265:    return TNAME;
+        -:  266:}
+        -:  267:
+        -:  268:
+        -:  269:/* Identify symbols and return their corresponding token code */
+function identify_symbol called 94 returned 100% blocks executed 67%
+       94:  270:int identify_symbol(char *tokenstr, FILE *fp) {
+       94:  271:    switch (tokenstr[0]) {
+branch  0 taken 7%
+branch  1 taken 7%
+branch  2 taken 0%
+branch  3 taken 5%
+branch  4 taken 6%
+branch  5 taken 5%
+branch  6 taken 1%
+branch  7 taken 17%
+branch  8 taken 35%
+branch  9 taken 4%
+branch 10 taken 0%
+branch 11 taken 11%
+branch 12 taken 0%
+branch 13 taken 0%
+branch 14 taken 0%
+        7:  272:        case '(': return TLPAREN;
+        7:  273:        case ')': return TRPAREN;
+    #####:  274:        case '*': return TSTAR;
+        5:  275:        case '+': return TPLUS;
+        6:  276:        case ',': return TCOMMA;
+        5:  277:        case '-': return TMINUS;
+        1:  278:        case '.': return TDOT;
+       16:  279:        case ':':
+       16:  280:            if (cbuf == '=') {
+branch  0 taken 94% (fallthrough)
+branch  1 taken 6%
+       15:  281:                cbuf = (char) fgetc(fp);
+call    0 returned 100%
+       15:  282:                return TASSIGN; // Return assignment token
+        -:  283:            }
+        1:  284:            return TCOLON;
+       33:  285:        case ';': return TSEMI;
+        4:  286:        case '<':
+       4*:  287:            if (cbuf == '>') { cbuf = (char) fgetc(fp); return TNOTEQ; }
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+       4*:  288:            if (cbuf == '=') { cbuf = (char) fgetc(fp); return TLEEQ; }
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+        4:  289:            return TLE;
+    #####:  290:        case '=': return TEQUAL;
+       10:  291:        case '>':
+       10:  292:            if (cbuf == '=') { cbuf = (char) fgetc(fp); return TGREQ; }
+branch  0 taken 40% (fallthrough)
+branch  1 taken 60%
+call    2 returned 100%
+        6:  293:            return TGR;
+    #####:  294:        case '[': return TLSQPAREN;
+    #####:  295:        case ']': return TRSQPAREN;
+    #####:  296:        default:
+    #####:  297:            error("failed to identify symbol.");
+call    0 never executed
+    #####:  298:            return -1; // Return error if symbol is not recognized
+        -:  299:    }
+        -:  300:}
+        -:  301:
+        -:  302:/* Store numbers in num_attr and return TNUMBER */
+        -:  303:/*
+        -:  304:int identify_number(const char *tokenstr) {
+        -:  305:    long temp = strtol(tokenstr, NULL, 10); // Convert string to long
+        -:  306:    if (temp <= 32767) {
+        -:  307:   // printf("%ld" ,temp);
+        -:  308:   printf("before:%d",num_attr);
+        -:  309:        num_attr = (int) temp; // Store value in num_attr
+        -:  310:         printf("someth:%d",num_attr);
+        -:  311:    } else {
+        -:  312:        error("number is bigger than 32767."); // Handle error for out-of-range number
+        -:  313:        return -1;
+        -:  314:    }
+        -:  315:    //snprintf(num_attr, MAXSTRSIZE, "%s", tempbuf); 
+        -:  316:    //printf("%ld" ,temp);
+        -:  317:    return TNUMBER; // Return TNUMBER
+        -:  318:}
+        -:  319:*/
+        -:  320:/* Store numbers in num_attr and return TNUMBER */
+function identify_number called 29 returned 100% blocks executed 71%
+       29:  321:int identify_number(const char *tokenstr) {
+       29:  322:    long temp = strtol(tokenstr, NULL, 10); // Convert string to long
+call    0 returned 100%
+       29:  323:    if (temp <= 32767) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       29:  324:        num_attr = (int) temp; // Store value in num_attr
+        -:  325:    } else {
+    #####:  326:        error("number is bigger than 32767."); // Handle error for out-of-range number
+call    0 never executed
+    #####:  327:        return -1;
+        -:  328:    }
+       29:  329:    return TNUMBER; // Return TNUMBER
+        -:  330:}
+        -:  331:
+        -:  332:
+        -:  333:/* Store string in string_attr and return TSTRING */
+        -:  334:
+        -:  335:
+function identify_string called 6 returned 100% blocks executed 67%
+        6:  336:int identify_string(FILE *fp) {
+        -:  337:    char tempbuf[MAXSTRSIZE];
+        6:  338:    int i = 0;
+        -:  339:
+       85:  340:    for (i = 0; (cbuf = (char) fgetc(fp)) != EOF; i++) {
+call    0 returned 100%
+branch  1 taken 100%
+branch  2 taken 0% (fallthrough)
+       85:  341:        if (i >= MAXSTRSIZE - 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  342:            error("String exceeds maximum length.");
+call    0 never executed
+    #####:  343:            return -1;
+        -:  344:        }
+        -:  345:
+       85:  346:        if (cbuf == '\'') {
+branch  0 taken 7% (fallthrough)
+branch  1 taken 93%
+        6:  347:            if ((cbuf = (char) fgetc(fp)) != '\'') {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+        6:  348:                tempbuf[i] = '\0'; // Null-terminate the string
+        6:  349:                snprintf(string_attr, MAXSTRSIZE, "%s", tempbuf); // Copy to string_attr
+        6:  350:                return TSTRING; // Return TSTRING token
+        -:  351:            }
+    #####:  352:            tempbuf[i++] = '\''; // Handle escaped single quote
+       79:  353:        } else if ((unsigned char)cbuf < 32 || (unsigned char)cbuf > 126) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  354:            error("Invalid character in string.");
+call    0 never executed
+    #####:  355:            return -1;
+        -:  356:        } else {
+       79:  357:            tempbuf[i] = cbuf;
+        -:  358:        }
+        -:  359:    }
+        -:  360:
+    #####:  361:    error("Unclosed string literal.");
+call    0 never executed
+    #####:  362:    return -1;
+        -:  363:}
+        -:  364:
+        -:  365:/* ====================== Core Scanning and Parsing Functions==parse==================== */
+        -:  366:/*
+        -:  367:int scan(FILE *fp) {
+        -:  368:    char strbuf[MAXSTRSIZE];
+        -:  369:    int i = 0, temp = 0, sep_type = 0;
+        -:  370:
+        -:  371:    init_char_array(strbuf, MAXSTRSIZE); // Initialize strbuf
+        -:  372:    
+        -:  373:    while ((sep_type = skip_separator(cbuf, fp)) != 0) {
+        -:  374:        if (sep_type == -1) return -1; // Return error if occurred
+        -:  375:    }
+        -:  376:    if (cbuf == EOF) return -1; // Check for EOF
+        -:  377:
+        -:  378:    // Identify the type of token in cbuf
+        -:  379:    if (is_check_symbol(cbuf)) {
+        -:  380:        strbuf[0] = cbuf;
+        -:  381:        cbuf = (char) fgetc(fp);
+        -:  382:        return identify_symbol(strbuf, fp); // Identify and return symbol
+        -:  383:    } else if (is_check_number(cbuf)) {
+        -:  384:        strbuf[0] = cbuf;
+        -:  385:        for (i = 1; (cbuf = (char) fgetc(fp)) != EOF; i++) {
+        -:  386:            if (is_check_token_size(i) == -1) return -1;
+        -:  387:            if (is_check_number(cbuf)) {
+        -:  388:                strbuf[i] = cbuf;
+        -:  389:            } else {
+        -:  390:                break; // Break on non-number character
+        -:  391:            }
+        -:  392:        }
+        -:  393:        return identify_number(strbuf); // Identify and return number
+        -:  394:    } else if (cbuf == '\'') {
+        -:  395:        return identify_string(fp); // Identify and return string
+        -:  396:    } else if (is_check_alphabet(cbuf)) {
+        -:  397:        strbuf[0] = cbuf;
+        -:  398:        for (i = 1; (cbuf = (char) fgetc(fp)) != EOF; i++) {
+        -:  399:            if (is_check_token_size(i) == -1) return -1;
+        -:  400:            if (is_check_alphabet(cbuf) || is_check_number(cbuf)) {
+        -:  401:                strbuf[i] = cbuf;
+        -:  402:            } else {
+        -:  403:                break; // Break on non-alphanumeric character
+        -:  404:            }
+        -:  405:        }
+        -:  406:        if ((temp = identify_keyword(strbuf)) != -1) return temp; // Identify keyword
+        -:  407:        return identify_name(strbuf); // Identify name
+        -:  408:    }
+        -:  409:
+        -:  410:    error("contain unexpected token."); // Handle unexpected token error
+        -:  411:    return -1;
+        -:  412:}
+        -:  413:*/
+function scan called 231 returned 100% blocks executed 89%
+      231:  414:int scan(FILE *fp) {
+        -:  415:    char strbuf[MAXSTRSIZE];
+      231:  416:    int i = 0, temp = 0, sep_type = 0;
+        -:  417:
+      231:  418:    init_char_array(strbuf, MAXSTRSIZE); // Initialize strbuf
+call    0 returned 100%
+      694:  419:    while ((sep_type = skip_separator(cbuf, fp)) != 0) {
+call    0 returned 100%
+branch  1 taken 67%
+branch  2 taken 33% (fallthrough)
+     463*:  420:        if (sep_type == -1) return -1; // Return error if occurred
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  421:    }
+     231*:  422:    if (cbuf == EOF) return -1; // Check for EOF
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  423:
+        -:  424:    // Identify the type of token in cbuf
+      231:  425:    if (is_check_symbol(cbuf)) {
+call    0 returned 100%
+branch  1 taken 41% (fallthrough)
+branch  2 taken 59%
+       94:  426:        strbuf[0] = cbuf;
+       94:  427:        cbuf = (char) fgetc(fp);
+call    0 returned 100%
+       94:  428:        return identify_symbol(strbuf, fp); // Identify and return symbol
+call    0 returned 100%
+      137:  429:    } else if (is_check_number(cbuf)) {
+call    0 returned 100%
+branch  1 taken 21% (fallthrough)
+branch  2 taken 79%
+       29:  430:        strbuf[0] = cbuf;
+       55:  431:        for (i = 1; (cbuf = (char) fgetc(fp)) != EOF; i++) {
+call    0 returned 100%
+branch  1 taken 100%
+branch  2 taken 0% (fallthrough)
+      55*:  432:            if (is_check_token_size(i) == -1) return -1;
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+       55:  433:            if (is_check_number(cbuf)) {
+call    0 returned 100%
+branch  1 taken 47% (fallthrough)
+branch  2 taken 53%
+       26:  434:                strbuf[i] = cbuf;
+        -:  435:            } else {
+       29:  436:                break; // Break on non-number character
+        -:  437:            }
+        -:  438:        }
+       29:  439:        return identify_number(strbuf); // Identify and return number
+call    0 returned 100%
+      108:  440:    } else if (cbuf == '\'') {
+branch  0 taken 6% (fallthrough)
+branch  1 taken 94%
+        6:  441:        return identify_string(fp); // Identify and return string
+call    0 returned 100%
+      102:  442:    } else if (is_check_alphabet(cbuf)) {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+      102:  443:        strbuf[0] = cbuf;
+      379:  444:        for (i = 1; (cbuf = (char) fgetc(fp)) != EOF; i++) {
+call    0 returned 100%
+branch  1 taken 100%
+branch  2 taken 0% (fallthrough)
+     379*:  445:            if (is_check_token_size(i) == -1) return -1;
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+      379:  446:            if (is_check_alphabet(cbuf) || is_check_number(cbuf)) {
+call    0 returned 100%
+branch  1 taken 27% (fallthrough)
+branch  2 taken 73%
+call    3 returned 100%
+branch  4 taken 0% (fallthrough)
+branch  5 taken 100%
+      277:  447:                strbuf[i] = cbuf;
+        -:  448:            } else {
+        -:  449:                break; // Break on non-alphanumeric character
+        -:  450:            }
+        -:  451:        }
+      102:  452:        if ((temp = identify_keyword(strbuf)) != -1) return temp; // Identify keyword
+call    0 returned 100%
+branch  1 taken 53% (fallthrough)
+branch  2 taken 47%
+       48:  453:        return identify_name(strbuf); // Identify name
+call    0 returned 100%
+        -:  454:    }
+        -:  455:
+    #####:  456:    error("contain unexpected token."); // Handle unexpected token error
+call    0 never executed
+    #####:  457:    return -1;
+        -:  458:}
+        -:  459:
+        -:  460:/* ====================== Miscellaneous and Cleanup Functions ====================== */
+        -:  461:
+        -:  462:/* Get the current line number */
+function get_linenum called 0 returned 0% blocks executed 0%
+    #####:  463:int get_linenum(void) {
+    #####:  464:    return linenum; // Return current line number
+        -:  465:}
+        -:  466:
+        -:  467:/* Close the file after scanning */
+function end_scan called 1 returned 100% blocks executed 75%
+        1:  468:void end_scan(FILE *fp) {
+        1:  469:    if (fclose(fp) == EOF) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  470:        error("File cannot close."); // Handle file close error
+call    0 never executed
+        -:  471:    }
+        1:  472:}

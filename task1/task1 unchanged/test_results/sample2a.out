@@ -1,0 +1,30 @@
+	"NAME" 	48
+	"program" 	1
+	"var" 	1
+	"begin" 	6
+	"end" 	6
+	"if" 	9
+	"then" 	9
+	"while" 	5
+	"do" 	5
+	"integer" 	1
+	"readln" 	1
+	"writeln" 	6
+	"NUMBER" 	29
+	"STRING" 	6
+	"+" 	5
+	"-" 	5
+	"<" 	4
+	">" 	6
+	">=" 	4
+	"(" 	7
+	")" 	7
+	":=" 	15
+	"." 	1
+	"," 	6
+	":" 	1
+	";" 	33
+	"break" 	4
+	"Identifier" "count"	26
+	"Identifier" "n"	21
+	"Identifier" "change"	1

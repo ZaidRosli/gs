@@ -1,0 +1,21 @@
+	"NAME" 	4
+	"program" 	1
+	"var" 	1
+	"begin" 	1
+	"end" 	1
+	"if" 	1
+	"then" 	1
+	"else" 	1
+	"char" 	1
+	"readln" 	1
+	"writeln" 	2
+	"NUMBER" 	1
+	"STRING" 	3
+	"=" 	1
+	"(" 	3
+	")" 	3
+	"." 	1
+	":" 	2
+	";" 	3
+	"Identifier" "ch"	3
+	"Identifier" "ifst"	1

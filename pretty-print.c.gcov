@@ -1,0 +1,1766 @@
+        -:    0:Source:pretty-print.c
+        -:    1://pretty_print.c 43 passed
+        -:    2:
+        -:    3:#include "pretty-print.h" //baru buat kat task2
+        -:    4:
+        -:    5:/* Variable to store the token read by scan() */
+        -:    6:int token;
+        -:    7:
+        -:    8:int indent_level = 0;
+        -:    9:
+        -:   10:/* Variable to store the existence of emptystatement */
+        -:   11:int existence_empty_statement = 0;
+        -:   12:
+function parse_program called 1 returned 100% blocks executed 62%
+        1:   13:int parse_program(FILE *fp) {
+        -:   14:    // Expect 'program' keyword
+        1:   15:    if (token != TPROGRAM) { 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   16:        return error("Keyword 'program' is not found");
+call    0 never executed
+        -:   17:    }
+        1:   18:    printf("%s ", tokenstr[token]); // Print "program"
+call    0 returned 100%
+        1:   19:    token = scan(fp); // Move to the next token
+call    0 returned 100%
+        -:   20:
+        -:   21:    // Expect program name
+        1:   22:    if (token != TNAME) { 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   23:        return error("Program name is not found");
+call    0 never executed
+        -:   24:    }
+        1:   25:    printf("%s", string_attr); // Print program name
+call    0 returned 100%
+        1:   26:    token = scan(fp); // Move to the next token
+call    0 returned 100%
+        -:   27:
+        -:   28:    // Expect semicolon
+        1:   29:    if (token != TSEMI) { 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   30:        return error("Semicolon is not found");
+call    0 never executed
+        -:   31:    }
+        1:   32:    printf("%s\n", tokenstr[token]); // Print ";" with a newline
+call    0 returned 100%
+        1:   33:    token = scan(fp); // Move to the next token
+call    0 returned 100%
+        -:   34:
+        -:   35:    // Parse the program block
+        1:   36:    if (parse_block(fp) == ERROR) { 
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   37:        return ERROR; 
+        -:   38:    }
+        -:   39:
+        -:   40:    // Expect period
+        1:   41:    if (token != TDOT) { 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   42:        return error("Period is not found at the end of program");
+call    0 never executed
+        -:   43:    }
+        1:   44:    printf("%s\n", tokenstr[token]); // Print "." with a newline
+call    0 returned 100%
+        -:   45:
+        1:   46:    return NORMAL;
+        -:   47:}
+        -:   48:
+        -:   49:
+function parse_block called 1 returned 100% blocks executed 52%
+        1:   50:int parse_block(FILE *fp) {
+        -:   51:    //int initial_indent_level = indent_level; // Save the initial indent level
+        -:   52:
+        2:   53:    while (token == TVAR || token == TPROCEDURE) {
+branch  0 taken 50%
+branch  1 taken 50% (fallthrough)
+branch  2 taken 0%
+branch  3 taken 100% (fallthrough)
+        1:   54:        switch (token) {
+branch  0 taken 100%
+branch  1 taken 0%
+branch  2 taken 0%
+        1:   55:            case TVAR:
+        -:   56:                //print_indent(); // Align "var" with the current indent level
+        1:   57:                if (parse_variable_declaration(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   58:                    return error("Failed to parse variable declaration in block");
+call    0 never executed
+        -:   59:                }
+        -:   60:                //indent_level = initial_indent_level; // Reset indent after variable declaration
+        1:   61:                break;
+    #####:   62:            case TPROCEDURE:
+        -:   63:                //print_indent(); // Align "procedure" with the current indent level
+    #####:   64:                if (parse_subprogram_declaration(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   65:                    return error("Failed to parse subprogram declaration in block");
+call    0 never executed
+        -:   66:                }
+        -:   67:                //indent_level = initial_indent_level; // Reset indent after subprogram declaration
+    #####:   68:                break;
+    #####:   69:            default:
+    #####:   70:                return error("Unexpected token in block");
+call    0 never executed
+        -:   71:        }
+        -:   72:    }
+        -:   73:
+        -:   74:    // Parse the compound statement at the end of the block
+        1:   75:    if (parse_compound_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   76:        return error("Failed to parse compound statement in block");
+call    0 never executed
+        -:   77:    }
+        -:   78:
+        1:   79:    return NORMAL;
+        -:   80:}
+        -:   81:
+function parse_variable_declaration called 1 returned 100% blocks executed 78%
+        1:   82:int parse_variable_declaration(FILE *fp) {
+        -:   83:    // Temporarily increase the indentation level for "var"
+        1:   84:    indent_level++;
+        -:   85:    // Print "var" at the current indentation level
+        1:   86:    print_indent(indent_level);
+call    0 returned 100%
+        1:   87:    printf("%s\n", tokenstr[token]); // Print "var"
+call    0 returned 100%
+        1:   88:    token = scan(fp);
+call    0 returned 100%
+        -:   89:
+        -:   90:    // Parse the variable declarations
+        1:   91:    indent_level++; // Increase indentation for variables
+        2:   92:    while (token == TNAME) {
+branch  0 taken 50%
+branch  1 taken 50% (fallthrough)
+        1:   93:        print_indent(indent_level);
+call    0 returned 100%
+        1:   94:        printf(" %s ", string_attr); // Print the first variable name
+call    0 returned 100%
+        1:   95:        token = scan(fp);
+call    0 returned 100%
+        -:   96:
+        -:   97:        // Handle multiple variables separated by commas
+        2:   98:        while (token == TCOMMA) {
+branch  0 taken 50%
+branch  1 taken 50% (fallthrough)
+        1:   99:            printf("%s", tokenstr[token]);
+call    0 returned 100%
+        1:  100:            token = scan(fp);
+call    0 returned 100%
+        -:  101:
+        1:  102:            if (token == TNAME) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  103:                printf(" %s ", string_attr);
+call    0 returned 100%
+        1:  104:                token = scan(fp);
+call    0 returned 100%
+        -:  105:            } else {
+    #####:  106:                return error("Expected variable name after ','");
+call    0 never executed
+        -:  107:            }
+        -:  108:        }
+        -:  109:
+        -:  110:        // Expect and print ":"
+        1:  111:        if (token == TCOLON) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  112:            printf("%s " ,tokenstr[token] );
+call    0 returned 100%
+        1:  113:            token = scan(fp);
+call    0 returned 100%
+        -:  114:        } else {
+    #####:  115:            return error("Expected ':' after variable names");
+call    0 never executed
+        -:  116:        }
+        -:  117:
+        -:  118:        // Print the type
+        1:  119:        if (parse_type(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  120:            return error("Failed to parse type");
+call    0 never executed
+        -:  121:        }
+        -:  122:
+        -:  123:        // Expect and print ";"
+        1:  124:        if (token == TSEMI) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  125:            printf(" %s\n", tokenstr[token]);
+call    0 returned 100%
+        1:  126:            token = scan(fp);
+call    0 returned 100%
+        -:  127:        } else {
+    #####:  128:            return error("Expected ';' at the end of variable declaration");
+call    0 never executed
+        -:  129:        }
+        -:  130:    }
+        1:  131:    indent_level-=2; // Restore indentation
+        -:  132:
+        1:  133:    return NORMAL;
+        -:  134:}
+        -:  135:
+        -:  136:
+function parse_variable_names called 0 returned 0% blocks executed 0%
+    #####:  137:int parse_variable_names(FILE *fp) {
+        -:  138:    // Ensure the first variable name exists and parse it
+    #####:  139:    if (parse_variable_name(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  140:        return error("Failed to parse the first variable name in the list");
+call    0 never executed
+        -:  141:    }
+        -:  142:
+        -:  143:    // Handle additional variable names separated by commas
+    #####:  144:    while (token == TCOMMA) {
+branch  0 never executed
+branch  1 never executed
+        -:  145:        //print_token(tokenstr[token], 0); // Print `,` without newline
+    #####:  146:        printf("%s", tokenstr[token]);
+call    0 never executed
+    #####:  147:        token = scan(fp);
+call    0 never executed
+        -:  148:
+        -:  149:        // Ensure a variable name follows the comma
+    #####:  150:        if (token != TNAME) {
+branch  0 never executed
+branch  1 never executed
+    #####:  151:            return error("Expected a variable name after ','");
+call    0 never executed
+        -:  152:        }
+        -:  153:
+        -:  154:        // Parse the next variable name
+    #####:  155:        if (parse_variable_name(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  156:            return error("Failed to parse a variable name after ','");
+call    0 never executed
+        -:  157:        }
+        -:  158:    }
+        -:  159:
+    #####:  160:    return NORMAL; // Successfully parsed the variable names list
+        -:  161:}
+        -:  162:
+function parse_variable_name called 45 returned 100% blocks executed 71%
+       45:  163:int parse_variable_name(FILE *fp) {
+        -:  164:    // Ensure the current token is a valid name
+       45:  165:    if (token != TNAME) { 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  166:        return error("Expected a variable name, but not found");
+call    0 never executed
+        -:  167:    }
+        -:  168:
+        -:  169:    // Sanitize and print the variable name
+      190:  170:    for (int i = 0; string_attr[i] != '\0'; i++) {
+branch  0 taken 76%
+branch  1 taken 24% (fallthrough)
+      145:  171:        if ((unsigned char)string_attr[i] < 32 || (unsigned char)string_attr[i] > 126) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  172:            return error("Variable name contains invalid characters");
+call    0 never executed
+        -:  173:        }
+        -:  174:    }
+        -:  175:	//printf("%s",tokenstr[token]);
+       45:  176:    print_token(string_attr, 0); // Print the variable name without newline
+call    0 returned 100%
+       45:  177:    token = scan(fp); // Move to the next token
+call    0 returned 100%
+        -:  178:
+       45:  179:    return NORMAL; // Parsing succeeded
+        -:  180:}
+        -:  181:
+function parse_type called 1 returned 100% blocks executed 43%
+        1:  182:int parse_type(FILE *fp) {
+        1:  183:    switch (token) {
+branch  0 taken 100%
+branch  1 taken 0%
+branch  2 taken 0%
+        1:  184:        case TINTEGER:
+        -:  185:        case TBOOLEAN:
+        -:  186:        case TCHAR:
+        -:  187:            // Parse a standard type
+        1:  188:            if (parse_standard_type(fp) == ERROR) { 
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  189:                return error("Failed to parse standard type"); 
+call    0 never executed
+        -:  190:            }
+        1:  191:            break;
+        -:  192:
+    #####:  193:        case TARRAY:
+        -:  194:            // Parse an array type
+    #####:  195:            if (parse_array_type(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  196:                return error("Failed to parse array type"); 
+call    0 never executed
+        -:  197:            }
+    #####:  198:            break;
+        -:  199:
+    #####:  200:        default:
+        -:  201:            // Provide detailed error information
+    #####:  202:            return error("Type is not found");
+call    0 never executed
+        -:  203:    }
+        -:  204:
+        1:  205:    return NORMAL; // Successfully parsed the type
+        -:  206:}
+        -:  207:
+function parse_standard_type called 1 returned 100% blocks executed 83%
+        1:  208:int parse_standard_type(FILE *fp) {
+        1:  209:    switch (token) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  210:        case TINTEGER:
+        -:  211:        case TBOOLEAN:
+        -:  212:        case TCHAR:
+        -:  213:            // Print the standard type token with proper formatting
+        -:  214:            //print_token(tokenstr[token], 0); 
+        1:  215:            printf("%s",tokenstr[token]);
+call    0 returned 100%
+        1:  216:            token = scan(fp); // Move to the next token
+call    0 returned 100%
+        1:  217:            return NORMAL;
+        -:  218:
+    #####:  219:        default:
+    #####:  220:            return error("Standard type is not found");
+call    0 never executed
+        -:  221:    }
+        -:  222:}
+        -:  223:
+function parse_array_type called 0 returned 0% blocks executed 0%
+    #####:  224:int parse_array_type(FILE *fp) {
+        -:  225:    // Parse "array"
+    #####:  226:    if (token != TARRAY) {
+branch  0 never executed
+branch  1 never executed
+    #####:  227:        return error("Expected 'array' keyword");
+call    0 never executed
+        -:  228:    }
+    #####:  229:    print_token(tokenstr[token], 0); // Print `array`
+call    0 never executed
+    #####:  230:    token = scan(fp);
+call    0 never executed
+        -:  231:
+        -:  232:    // Parse "["
+    #####:  233:    if (token != TLSQPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  234:        return error("Expected '[' after 'array'");
+call    0 never executed
+        -:  235:    }
+    #####:  236:    print_token(tokenstr[token], 0); // Print `[`
+call    0 never executed
+    #####:  237:    token = scan(fp);
+call    0 never executed
+        -:  238:
+        -:  239:    // Parse the array size (number)
+    #####:  240:    if (token != TNUMBER) {
+branch  0 never executed
+branch  1 never executed
+    #####:  241:        return error("Expected a number inside '[]' to specify array size");
+call    0 never executed
+        -:  242:    }
+        -:  243:    char buffer[32];
+    #####:  244:    snprintf(buffer, sizeof(buffer), "%d", num_attr); // Convert the number to a string
+    #####:  245:    print_token(buffer, 0); // Print the numeric value
+call    0 never executed
+    #####:  246:    token = scan(fp);
+call    0 never executed
+        -:  247:
+        -:  248:    // Parse "]"
+    #####:  249:    if (token != TRSQPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  250:        return error("Expected ']' after array size");
+call    0 never executed
+        -:  251:    }
+    #####:  252:    print_token(tokenstr[token], 0); // Print `]`
+call    0 never executed
+    #####:  253:    token = scan(fp);
+call    0 never executed
+        -:  254:
+        -:  255:    // Parse "of"
+    #####:  256:    if (token != TOF) {
+branch  0 never executed
+branch  1 never executed
+    #####:  257:        return error("Expected 'of' keyword after '[]'");
+call    0 never executed
+        -:  258:    }
+    #####:  259:    print_token(tokenstr[token], 0); // Print `of`
+call    0 never executed
+    #####:  260:    token = scan(fp);
+call    0 never executed
+        -:  261:
+        -:  262:    // Parse the type following "of"
+    #####:  263:    if (parse_standard_type(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  264:        return error("Failed to parse type after 'of'");
+call    0 never executed
+        -:  265:    }
+        -:  266:
+    #####:  267:    return NORMAL; // Successfully parsed the array type
+        -:  268:}
+        -:  269:
+function parse_subprogram_declaration called 0 returned 0% blocks executed 0%
+    #####:  270:int parse_subprogram_declaration(FILE *fp) {
+        -:  271:    // Increment indent_level to apply indentation for the procedure
+    #####:  272:    indent_level++;
+        -:  273:
+        -:  274:    // Print "procedure" at the current indentation level
+    #####:  275:    print_indent(indent_level); 
+call    0 never executed
+    #####:  276:    printf("%s ", tokenstr[token]); // Print "procedure"
+call    0 never executed
+    #####:  277:    token = scan(fp);
+call    0 never executed
+        -:  278:
+        -:  279:    // Parse procedure name
+    #####:  280:    if (parse_procedure_name(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  281:        return ERROR;
+        -:  282:    }
+        -:  283:
+        -:  284:    // Parse optional formal parameters
+    #####:  285:    if (token == TLPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  286:        if (parse_formal_parameters(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  287:            return ERROR;
+        -:  288:        }
+        -:  289:    }
+        -:  290:
+        -:  291:    // Expect and print ";"
+    #####:  292:    if (token == TSEMI) {
+branch  0 never executed
+branch  1 never executed
+    #####:  293:        printf("%s\n", tokenstr[token]); // Print semicolon and newline
+call    0 never executed
+    #####:  294:        token = scan(fp);
+call    0 never executed
+        -:  295:    } else {
+    #####:  296:        return error("Expected ';' after procedure declaration");
+call    0 never executed
+        -:  297:    }
+        -:  298:
+        -:  299:    // Parse optional variable declaration
+    #####:  300:    if (token == TVAR) {
+branch  0 never executed
+branch  1 never executed
+    #####:  301:        if (parse_variable_declaration(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  302:            return error("Failed to parse variable declarations in procedure");
+call    0 never executed
+        -:  303:        }
+        -:  304:    }
+        -:  305:
+        -:  306:    // Parse procedure body (compound statement)
+    #####:  307:    if (parse_compound_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  308:        return error("Failed to parse procedure body");
+call    0 never executed
+        -:  309:    }
+        -:  310:
+        -:  311:    // Expect and print the closing ";"
+    #####:  312:    if (token == TSEMI) {
+branch  0 never executed
+branch  1 never executed
+    #####:  313:        print_indent(indent_level - 1); // Align `;` with `procedure` keyword
+call    0 never executed
+    #####:  314:        printf("%s\n", tokenstr[token]); // Print semicolon and newline
+call    0 never executed
+    #####:  315:        token = scan(fp);
+call    0 never executed
+        -:  316:    } else {
+    #####:  317:        return error("Expected ';' after procedure body");
+call    0 never executed
+        -:  318:    }
+        -:  319:
+        -:  320:    // Decrement indent_level after processing the procedure
+    #####:  321:    indent_level--;
+        -:  322:
+    #####:  323:    return NORMAL;
+        -:  324:}
+        -:  325:
+        -:  326:
+        -:  327:
+        -:  328:
+function parse_procedure_name called 0 returned 0% blocks executed 0%
+    #####:  329:int parse_procedure_name(FILE *fp) {
+    #####:  330:    if (token != TNAME) {
+branch  0 never executed
+branch  1 never executed
+    #####:  331:        return error("Procedure name is not found");
+call    0 never executed
+        -:  332:    }
+        -:  333:
+        -:  334:    // Print the procedure name
+    #####:  335:    printf("%s", tokenstr[token]); 
+call    0 never executed
+        -:  336:
+        -:  337:    // Move to the next token
+    #####:  338:    token = scan(fp);
+call    0 never executed
+        -:  339:
+    #####:  340:    return NORMAL;
+        -:  341:}
+        -:  342:
+function parse_formal_parameters called 0 returned 0% blocks executed 0%
+    #####:  343:int parse_formal_parameters(FILE *fp) {
+    #####:  344:    if (token != TLPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  345:        return error("Symbol '(' is not found");
+call    0 never executed
+        -:  346:    }
+        -:  347:
+    #####:  348:    print_token(tokenstr[token], 0); // Print `(` without newline
+call    0 never executed
+    #####:  349:    token = scan(fp);
+call    0 never executed
+        -:  350:
+    #####:  351:    while (token == TNAME) {
+branch  0 never executed
+branch  1 never executed
+    #####:  352:        if (parse_variable_names(fp) == ERROR) { // Parse variable names
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  353:            return error("var_names missing");
+call    0 never executed
+        -:  354:        }
+        -:  355:
+    #####:  356:        if (token != TCOLON) {
+branch  0 never executed
+branch  1 never executed
+    #####:  357:            return error("Symbol ':' is not found");
+call    0 never executed
+        -:  358:        }
+    #####:  359:        print_token(tokenstr[token], 0); // Print `:` without newline
+call    0 never executed
+    #####:  360:        token = scan(fp);
+call    0 never executed
+        -:  361:
+    #####:  362:        if (parse_type(fp) == ERROR) { // Parse the type
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  363:            return error("type missing");
+call    0 never executed
+        -:  364:        }
+        -:  365:
+    #####:  366:        if (token == TSEMI) { // Check for additional parameter groups
+branch  0 never executed
+branch  1 never executed
+        -:  367:            //print_token(tokenstr[token], 0); // Print `;` without newline
+    #####:  368:            printf("%s", tokenstr[token]);
+call    0 never executed
+    #####:  369:            token = scan(fp);
+call    0 never executed
+        -:  370:        } else {
+    #####:  371:            break; // No more parameter groups
+        -:  372:        }
+        -:  373:    }
+        -:  374:
+    #####:  375:    if (token != TRPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  376:        return error("Symbol ')' is not found");
+call    0 never executed
+        -:  377:    }
+        -:  378:
+    #####:  379:    printf("%s", tokenstr[token]);
+call    0 never executed
+    #####:  380:    token = scan(fp);
+call    0 never executed
+        -:  381:
+    #####:  382:    return NORMAL;
+        -:  383:}
+        -:  384:
+function parse_compound_statement called 6 returned 100% blocks executed 71%
+        6:  385:int parse_compound_statement(FILE *fp) {
+        6:  386:    if (token != TBEGIN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  387:        return error("Expected 'begin'");
+call    0 never executed
+        -:  388:    }
+        -:  389:
+        -:  390:    // Print "begin" at the current indentation level
+        6:  391:    print_indent(indent_level);
+call    0 returned 100%
+        6:  392:    printf("%s\n", tokenstr[token]); // Print "begin"
+call    0 returned 100%
+        6:  393:    indent_level++; // Increase indentation for statements inside the block
+        6:  394:    token = scan(fp);
+call    0 returned 100%
+        -:  395:
+        -:  396:    // Parse statements inside the block
+       37:  397:    while (token != TEND && token != EOF) {
+branch  0 taken 84% (fallthrough)
+branch  1 taken 16%
+branch  2 taken 100%
+branch  3 taken 0% (fallthrough)
+        -:  398:        // Print each statement with increased indentation
+       31:  399:        print_indent(indent_level);
+call    0 returned 100%
+       31:  400:        if (parse_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  401:            return error("Failed to parse statement");
+call    0 never executed
+        -:  402:        }
+        -:  403:
+        -:  404:        // Handle semicolon after each statement
+       31:  405:        if (token == TSEMI) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       31:  406:            printf("%s\n", tokenstr[token]); // Print `;` with a newline
+call    0 returned 100%
+       31:  407:            token = scan(fp);
+call    0 returned 100%
+    #####:  408:        } else if (token != TEND) {
+branch  0 never executed
+branch  1 never executed
+    #####:  409:            return error("Expected ';' between statements");
+call    0 never executed
+        -:  410:        }
+        -:  411:    }
+        -:  412:
+        -:  413:    // Print "end" at the same level as "begin"
+        6:  414:    if (token == TEND) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        6:  415:    printf("\n");
+call    0 returned 100%
+        6:  416:        indent_level--; // Restore indentation for "end"
+        6:  417:        print_indent(indent_level);
+call    0 returned 100%
+        6:  418:        printf("%s", tokenstr[token]); // Print "end"
+call    0 returned 100%
+        6:  419:        token = scan(fp);
+call    0 returned 100%
+        -:  420:    } else {
+    #####:  421:        return error("Expected 'end'");
+call    0 never executed
+        -:  422:    }
+        -:  423:
+        6:  424:    return NORMAL;
+        -:  425:}
+        -:  426:
+function parse_statement called 40 returned 100% blocks executed 43%
+       40:  427:int parse_statement(FILE *fp) {
+        -:  428:    // Indent the current statement
+        -:  429:    //print_indent(indent_level);
+        -:  430:
+       40:  431:    switch (token) {
+branch  0 taken 38%
+branch  1 taken 22%
+branch  2 taken 12%
+branch  3 taken 10%
+branch  4 taken 0%
+branch  5 taken 2%
+branch  6 taken 15%
+branch  7 taken 0%
+branch  8 taken 0%
+branch  9 taken 0%
+       15:  432:        case TNAME: // Assignment statement
+       15:  433:            if (parse_assignment_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  434:                return error("Failed to parse assignment statement");
+call    0 never executed
+        -:  435:            }
+       15:  436:            break;
+        -:  437:
+        9:  438:        case TIF: // Conditional statement
+        9:  439:            if (parse_condition_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  440:                return error("Failed to parse conditional statement");
+call    0 never executed
+        -:  441:            }
+        9:  442:            break;
+        -:  443:
+        5:  444:        case TWHILE: // Iteration statement
+        5:  445:            if (parse_iteration_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  446:                return error("Failed to parse iteration statement");
+call    0 never executed
+        -:  447:            }
+        5:  448:            break;
+        -:  449:
+        4:  450:        case TBREAK: // Exit statement
+        4:  451:            if (parse_exit_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  452:                return error("Failed to parse exit statement");
+call    0 never executed
+        -:  453:            }
+        4:  454:            break;
+        -:  455:
+    #####:  456:        case TCALL: // Procedure call statement
+    #####:  457:            if (parse_call_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  458:                return error("Failed to parse procedure call statement");
+call    0 never executed
+        -:  459:            }
+    #####:  460:            break;
+        -:  461:
+        1:  462:        case TREAD:
+        -:  463:        case TREADLN: // Input statement
+        1:  464:            if (parse_input_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  465:                return error("Failed to parse input statement");
+call    0 never executed
+        -:  466:            }
+        1:  467:            break;
+        -:  468:
+        6:  469:        case TWRITE:
+        -:  470:        case TWRITELN: // Output statement
+        6:  471:            if (parse_output_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  472:                return error("Failed to parse output statement");
+call    0 never executed
+        -:  473:            }
+        6:  474:            break;
+        -:  475:
+    #####:  476:        case TRETURN: // Return statement
+    #####:  477:            if (parse_return_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  478:                return error("Failed to parse return statement");
+call    0 never executed
+        -:  479:            }
+    #####:  480:            break;
+        -:  481:
+    #####:  482:        case TBEGIN: // Compound statement
+    #####:  483:            if (parse_compound_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  484:                return error("Failed to parse compound statement");
+call    0 never executed
+        -:  485:            }
+    #####:  486:            break;
+        -:  487:/*
+        -:  488:        case TSEMI: // Empty statement (explicit)
+        -:  489:            printf("%s\n", tokenstr[token]); // Print `;` with a newline
+        -:  490:            token = scan(fp); // Move to the next token
+        -:  491:            break;
+        -:  492:*/
+    #####:  493:        default: // Implicit empty statement or unknown token
+    #####:  494:            return parse_empty_statement(fp); // Handles implicit empty statements
+call    0 never executed
+        -:  495:    }
+        -:  496:
+       40:  497:    return NORMAL;
+        -:  498:}
+        -:  499:
+function parse_condition_statement called 9 returned 100% blocks executed 39%
+        9:  500:int parse_condition_statement(FILE *fp) {
+        9:  501:    if (token != TIF) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  502:        return error("Expected 'if'");
+call    0 never executed
+        -:  503:    }
+        -:  504:
+        -:  505:    // Print "if" and the condition
+        9:  506:    print_indent(indent_level);
+call    0 returned 100%
+        9:  507:    printf("%s ", tokenstr[token]); // Print "if"
+call    0 returned 100%
+        9:  508:    token = scan(fp);
+call    0 returned 100%
+        -:  509:
+        -:  510:    // Parse the condition expression
+        9:  511:    if (parse_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  512:        return error("Failed to parse condition expression");
+call    0 never executed
+        -:  513:    }
+        -:  514:
+        -:  515:    // Expect "then"
+        9:  516:    if (token != TTHEN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  517:        return error("Expected 'then'");
+call    0 never executed
+        -:  518:    }
+        9:  519:    printf("%s\n", tokenstr[token]); // Print "then" with a newline
+call    0 returned 100%
+        9:  520:    token = scan(fp);
+call    0 returned 100%
+        -:  521:
+        -:  522:    // Parse the statement under "then"
+        9:  523:    if (token == TBEGIN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  524:        if (parse_compound_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  525:            return error("Failed to parse compound statement after 'then'");
+call    0 never executed
+        -:  526:        }
+        -:  527:    } else {
+        9:  528:        indent_level++; // Temporarily increase indentation
+        9:  529:        print_indent(indent_level);
+call    0 returned 100%
+        9:  530:        if (parse_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  531:            return error("Failed to parse single-line statement after 'then'");
+call    0 never executed
+        -:  532:        }
+        9:  533:        indent_level--; // Restore original indentation
+        -:  534:    }
+        -:  535:
+        -:  536:    // Handle "else" if present
+        9:  537:    if (token == TELSE) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  538:        printf("\n"); // Add a newline before "else"
+call    0 never executed
+    #####:  539:        print_indent(indent_level); // Align "else" with "if"
+call    0 never executed
+    #####:  540:        printf("%s\n", tokenstr[token]); // Print "else"
+call    0 never executed
+    #####:  541:        token = scan(fp);
+call    0 never executed
+        -:  542:
+    #####:  543:        if (token == TBEGIN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  544:            if (parse_compound_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  545:                return error("Failed to parse compound statement after 'else'");
+call    0 never executed
+        -:  546:            }
+        -:  547:        } else {
+    #####:  548:            indent_level++; // Temporarily increase indentation
+    #####:  549:            print_indent(indent_level);
+call    0 never executed
+    #####:  550:            if (parse_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  551:                return error("Failed to parse single-line statement after 'else'");
+call    0 never executed
+        -:  552:            }
+    #####:  553:            indent_level--; // Restore original indentation
+        -:  554:        }
+        -:  555:    }
+        -:  556:
+        9:  557:    return NORMAL;
+        -:  558:}
+        -:  559:
+function parse_iteration_statement called 5 returned 100% blocks executed 50%
+        5:  560:int parse_iteration_statement(FILE *fp) {
+        5:  561:    if (token != TWHILE) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  562:        return error("Expected 'while'");
+call    0 never executed
+        -:  563:    }
+        -:  564:
+        -:  565:    // Print "while" and the condition
+        -:  566:    //print_indent(indent_level);
+        5:  567:    printf("%s ", tokenstr[token]); // Print "while"
+call    0 returned 100%
+        5:  568:    token = scan(fp);
+call    0 returned 100%
+        -:  569:
+        -:  570:    // Parse the condition expression
+        5:  571:    if (parse_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  572:        return error("Failed to parse condition expression");
+call    0 never executed
+        -:  573:    }
+        -:  574:
+        -:  575:    // Expect "do"
+        5:  576:    if (token != TDO) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  577:        return error("Expected 'do'");
+call    0 never executed
+        -:  578:    }
+        5:  579:    printf(" %s\n", tokenstr[token]); // Print "do" with a newline
+call    0 returned 100%
+        5:  580:    token = scan(fp);
+call    0 returned 100%
+        -:  581:
+        -:  582:    // Increase the indent level temporarily for the statement under "do"
+        5:  583:    int current_indent_level = indent_level; // Save the current level
+        5:  584:    if (current_indent_level == 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  585:        current_indent_level = 1; // Ensure there's at least one level of indentation
+        -:  586:    }
+        5:  587:    indent_level++; // Temporarily increase indentation
+        -:  588:
+        -:  589:    // Parse the statement or block under "do"
+        5:  590:    if (token == TBEGIN) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  591:        // Parse the compound statement if present
+        5:  592:        if (parse_compound_statement(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  593:            return error("Failed to parse compound statement after 'do'");
+call    0 never executed
+        -:  594:        }
+        -:  595:    } else {
+        -:  596:        // Handle single-line statements with the adjusted indentation
+    #####:  597:        print_indent(indent_level);
+call    0 never executed
+    #####:  598:        if (parse_statement(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  599:            return error("Failed to parse single-line statement after 'do'");
+call    0 never executed
+        -:  600:        }
+        -:  601:    }
+        -:  602:
+        -:  603:    // Restore the original indentation level
+        5:  604:    indent_level = current_indent_level;
+        -:  605:
+        5:  606:    return NORMAL;
+        -:  607:}
+        -:  608:
+        -:  609:
+        -:  610:
+function parse_exit_statement called 4 returned 100% blocks executed 71%
+        4:  611:int parse_exit_statement(FILE *fp) {
+        4:  612:    if (token != TBREAK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  613:        return error("Keyword 'break' is not found");
+call    0 never executed
+        -:  614:    }
+        -:  615:
+        -:  616:    // Print the "break" token
+        -:  617:    //printf("%s ", tokenstr[token]);
+        4:  618:    print_token(tokenstr[token], 1);
+call    0 returned 100%
+        4:  619:    token = scan(fp); // Move to the next token
+call    0 returned 100%
+        -:  620:
+        4:  621:    return NORMAL;
+        -:  622:}
+        -:  623:
+function parse_call_statement called 0 returned 0% blocks executed 0%
+    #####:  624:int parse_call_statement(FILE *fp) {
+    #####:  625:    if (token != TCALL) {
+branch  0 never executed
+branch  1 never executed
+    #####:  626:        return error("Keyword 'call' is not found");
+call    0 never executed
+        -:  627:    }
+        -:  628:
+        -:  629:    //printf("%s ", tokenstr[token]);
+    #####:  630:    print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  631:    token = scan(fp);
+call    0 never executed
+        -:  632:
+    #####:  633:    if (parse_procedure_name(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  634:        return error("proceure_name missing");
+call    0 never executed
+        -:  635:    }
+        -:  636:
+    #####:  637:    if (token == TLPAREN) {
+branch  0 never executed
+branch  1 never executed
+        -:  638:       // printf("%s ", tokenstr[token]);
+    #####:  639:        print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  640:        token = scan(fp);
+call    0 never executed
+        -:  641:
+    #####:  642:        if (parse_expressions(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  643:            return error("exressions not found");
+call    0 never executed
+        -:  644:        }
+        -:  645:
+    #####:  646:        if (token != TRPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  647:            return error("Symbol ')' is not found");
+call    0 never executed
+        -:  648:        }
+        -:  649:
+        -:  650:       // printf("%s ", tokenstr[token]);
+    #####:  651:        print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  652:        token = scan(fp);
+call    0 never executed
+        -:  653:    }
+        -:  654:
+    #####:  655:    return NORMAL;
+        -:  656:}
+        -:  657:
+        -:  658:
+function parse_expressions called 0 returned 0% blocks executed 0%
+    #####:  659:int parse_expressions(FILE *fp) {
+        -:  660:    // Parse the first expression
+    #####:  661:    if (parse_expression(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  662:        return error("expression missing");
+call    0 never executed
+        -:  663:    }
+        -:  664:
+        -:  665:    // Handle subsequent expressions separated by commas
+    #####:  666:    while (token == TCOMMA) {
+branch  0 never executed
+branch  1 never executed
+    #####:  667:        print_token(tokenstr[token], 0); // Print `,` with a space
+call    0 never executed
+    #####:  668:        token = scan(fp);
+call    0 never executed
+        -:  669:
+    #####:  670:        if (parse_expression(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  671:            return error("expression missing");
+call    0 never executed
+        -:  672:        }
+        -:  673:    }
+        -:  674:
+    #####:  675:    return NORMAL;
+        -:  676:}
+        -:  677:
+function parse_return_statement called 0 returned 0% blocks executed 0%
+    #####:  678:int parse_return_statement(FILE *fp) {
+        -:  679:    // Ensure the current token is 'return'
+    #####:  680:    if (token != TRETURN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  681:        return error("Keyword 'return' is not found");
+call    0 never executed
+        -:  682:    }
+        -:  683:
+        -:  684:    // Print the `return` keyword and move to the next line
+    #####:  685:    print_token(tokenstr[token], 1); // Use newline_after = 1 to add a newline
+call    0 never executed
+    #####:  686:    token = scan(fp);               // Advance to the next token
+call    0 never executed
+        -:  687:
+    #####:  688:    return NORMAL; // Parsing succeeded
+        -:  689:}
+        -:  690:
+        -:  691:
+function parse_assignment_statement called 15 returned 100% blocks executed 60%
+       15:  692:int parse_assignment_statement(FILE *fp) {
+        -:  693:    // Add indentation for the assignment statement
+        -:  694:    //print_indent();
+        -:  695:
+        -:  696:    // Parse the left-hand side of the assignment
+       15:  697:    if (parse_left_part(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  698:        return error("left_part missing");
+call    0 never executed
+        -:  699:    }
+        -:  700:
+        -:  701:    // Ensure the assignment operator ':=' is present
+       15:  702:    if (token != TASSIGN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  703:        return error("Symbol ':=' is not found in assignment statement");
+call    0 never executed
+        -:  704:    }
+        -:  705:
+        -:  706:    // Print the ':=' token and move to the next token
+       15:  707:    print_token(tokenstr[token], 0);
+call    0 returned 100%
+       15:  708:    token = scan(fp);
+call    0 returned 100%
+        -:  709:
+        -:  710:    // Parse the right-hand side (expression) of the assignment
+       15:  711:    if (parse_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  712:        return error("expression missing");
+call    0 never executed
+        -:  713:    }
+        -:  714:
+        -:  715:    // Add a newline after the entire statement for proper formatting
+        -:  716:    //printf("\n");
+        -:  717:
+       15:  718:    return NORMAL;
+        -:  719:}
+        -:  720:
+        -:  721:
+function parse_left_part called 15 returned 100% blocks executed 67%
+       15:  722:int parse_left_part(FILE *fp) {
+      15*:  723:    if (parse_variable(fp) == ERROR) { return error("variable missing"); }
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+call    3 never executed
+        -:  724:
+       15:  725:    return NORMAL;
+        -:  726:}
+        -:  727:
+function parse_variable called 45 returned 100% blocks executed 26%
+       45:  728:int parse_variable(FILE *fp) {
+        -:  729:    // Parse the variable name
+       45:  730:    if (parse_variable_name(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  731:        return error("variable_name missing");
+call    0 never executed
+        -:  732:    }
+        -:  733:
+        -:  734:    // Check for array indexing (e.g., variable[index])
+       45:  735:    if (token == TLSQPAREN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  736:        print_token(tokenstr[token], 0); // Print `[`
+call    0 never executed
+    #####:  737:        token = scan(fp);
+call    0 never executed
+        -:  738:
+        -:  739:        // Parse the expression inside the brackets
+    #####:  740:        if (parse_expression(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  741:            return error("expression missing");
+call    0 never executed
+        -:  742:        }
+        -:  743:
+        -:  744:        // Ensure the closing bracket `]` is present
+    #####:  745:        if (token != TRSQPAREN) {
+branch  0 never executed
+branch  1 never executed
+    #####:  746:            return error("Symbol ']' is not found at the end of expression");
+call    0 never executed
+        -:  747:        }
+    #####:  748:        print_token(tokenstr[token], 0); // Print `]`
+call    0 never executed
+    #####:  749:        token = scan(fp); // Move to the next token
+call    0 never executed
+        -:  750:    }
+        -:  751:
+       45:  752:    return NORMAL; // Successfully parsed
+        -:  753:}
+        -:  754:
+function parse_expression called 34 returned 100% blocks executed 65%
+       34:  755:int parse_expression(FILE *fp) {
+        -:  756:    // Parse the first simple expression
+       34:  757:    if (parse_simple_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  758:        return error("Failed to parse simple expression in expression");
+call    0 never executed
+        -:  759:    }
+        -:  760:
+        -:  761:    // Loop to handle relational operators followed by simple expressions
+       48:  762:    while (is_relational_operator(token)) {
+call    0 returned 100%
+branch  1 taken 29%
+branch  2 taken 71% (fallthrough)
+       14:  763:        if (parse_relational_operator(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  764:            return error("relational_operator missing");
+call    0 never executed
+        -:  765:        }
+        -:  766:
+       14:  767:        if (parse_simple_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  768:            return error("Failed to parse simple expression after relational operator");
+call    0 never executed
+        -:  769:        }
+        -:  770:    }
+        -:  771:
+       34:  772:    return NORMAL; // Successfully parsed
+        -:  773:}
+        -:  774:
+function parse_simple_expression called 48 returned 100% blocks executed 67%
+       48:  775:int parse_simple_expression(FILE *fp) {
+        -:  776:    // Handle optional unary operators
+       48:  777:    if (token == TPLUS || token == TMINUS) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  778:        print_token(tokenstr[token], 0); // Print `+` or `-` without a newline
+call    0 never executed
+    #####:  779:        token = scan(fp);
+call    0 never executed
+        -:  780:    }
+        -:  781:
+        -:  782:    // Parse the first term
+       48:  783:    if (parse_term(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  784:        return error("term missing");
+call    0 never executed
+        -:  785:    }
+        -:  786:
+        -:  787:    // Handle { additive_operator term }
+       58:  788:    while (token == TPLUS || token == TMINUS || token == TOR) {
+branch  0 taken 9%
+branch  1 taken 91% (fallthrough)
+branch  2 taken 9%
+branch  3 taken 91% (fallthrough)
+branch  4 taken 0%
+branch  5 taken 100% (fallthrough)
+       10:  789:        print_token(tokenstr[token], 0); // Print the additive operator
+call    0 returned 100%
+       10:  790:        token = scan(fp);
+call    0 returned 100%
+        -:  791:
+        -:  792:        // Parse the next term
+       10:  793:        if (parse_term(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  794:            return error("term missing");
+call    0 never executed
+        -:  795:        }
+        -:  796:    }
+        -:  797:
+       48:  798:    return NORMAL; // Successfully parsed
+        -:  799:}
+        -:  800:
+function parse_term called 58 returned 100% blocks executed 41%
+       58:  801:int parse_term(FILE *fp) {
+        -:  802:    // Grammar: 項 (term) ::= 因子 { 乗法演算子 因子 }
+        -:  803:
+        -:  804:    // Parse the first factor
+       58:  805:    if (parse_factor(fp) == ERROR) { 
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  806:        return error("factor missing"); 
+call    0 never executed
+        -:  807:    }
+        -:  808:
+        -:  809:    // Handle the { 乗法演算子 因子 } part
+       58:  810:    while (is_multiplicative_operator(token)) {
+call    0 returned 100%
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+        -:  811:        // Parse the multiplicative operator
+    #####:  812:        if (parse_multiplicative_operator(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  813:            return error("multiplicative opr missing"); 
+call    0 never executed
+        -:  814:        }
+        -:  815:
+        -:  816:        // Parse the next factor
+    #####:  817:        if (parse_factor(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  818:            return error("factor missing"); 
+call    0 never executed
+        -:  819:        }
+        -:  820:    }
+        -:  821:
+       58:  822:    return NORMAL; // Successfully parsed
+        -:  823:}
+        -:  824:
+function parse_factor called 58 returned 100% blocks executed 18%
+       58:  825:int parse_factor(FILE *fp) {
+       58:  826:    switch (token) {
+branch  0 taken 50%
+branch  1 taken 50%
+branch  2 taken 0%
+branch  3 taken 0%
+branch  4 taken 0%
+branch  5 taken 0%
+       29:  827:        case TNAME: // Handle variables (変数)
+       29:  828:            if (parse_variable(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  829:                return error("variable missing");
+call    0 never executed
+        -:  830:            }
+       29:  831:            break;
+        -:  832:
+       29:  833:        case TNUMBER: // Handle constants (定数)
+        -:  834:        case TFALSE:
+        -:  835:        case TTRUE:
+        -:  836:        case TSTRING:
+       29:  837:            if (parse_constant(fp) == ERROR) { 
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  838:                return error("constant missing"); 
+call    0 never executed
+        -:  839:            }
+       29:  840:            break;
+        -:  841:
+    #####:  842:        case TLPAREN: // Handle "(" 式 ")"
+    #####:  843:            print_token(tokenstr[token], 0); // Print `(`
+call    0 never executed
+    #####:  844:            token = scan(fp);
+call    0 never executed
+        -:  845:
+    #####:  846:            if (parse_expression(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  847:                return error("expression missing"); 
+call    0 never executed
+        -:  848:            }
+        -:  849:
+    #####:  850:            if (token != TRPAREN) { 
+branch  0 never executed
+branch  1 never executed
+    #####:  851:                return error("Expected ')' but not found"); 
+call    0 never executed
+        -:  852:            }
+        -:  853:
+    #####:  854:            print_token(tokenstr[token], 0); // Print `)`
+call    0 never executed
+    #####:  855:            token = scan(fp);
+call    0 never executed
+    #####:  856:            break;
+        -:  857:
+    #####:  858:        case TNOT: // Handle "not" 因子
+    #####:  859:            print_token(tokenstr[token], 0); // Print `not`
+call    0 never executed
+    #####:  860:            token = scan(fp);
+call    0 never executed
+        -:  861:
+    #####:  862:            if (parse_factor(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  863:                return error("factor missing"); 
+call    0 never executed
+        -:  864:            }
+    #####:  865:            break;
+        -:  866:
+    #####:  867:        case TINTEGER: // Handle "標準型 "(" 式 ")"
+        -:  868:        case TBOOLEAN:
+        -:  869:        case TCHAR:
+    #####:  870:            if (parse_standard_type(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  871:                return ERROR; 
+        -:  872:            } // Print handled by parse_standard_type
+        -:  873:
+    #####:  874:            if (token != TLPAREN) { 
+branch  0 never executed
+branch  1 never executed
+    #####:  875:                return error("Expected '(' after standard type but not found"); 
+call    0 never executed
+        -:  876:            }
+        -:  877:
+    #####:  878:            print_token(tokenstr[token], 0); // Print `(`
+call    0 never executed
+    #####:  879:            token = scan(fp);
+call    0 never executed
+        -:  880:
+    #####:  881:            if (parse_expression(fp) == ERROR) { 
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  882:                return error("expression missing"); 
+call    0 never executed
+        -:  883:            }
+        -:  884:
+    #####:  885:            if (token != TRPAREN) { 
+branch  0 never executed
+branch  1 never executed
+    #####:  886:                return error("Expected ')' but not found"); 
+call    0 never executed
+        -:  887:            }
+        -:  888:
+    #####:  889:            print_token(tokenstr[token], 0); // Print `)`
+call    0 never executed
+    #####:  890:            token = scan(fp);
+call    0 never executed
+    #####:  891:            break;
+        -:  892:
+    #####:  893:        default: // Handle missing factor
+    #####:  894:            return error("Factor is missing or invalid");
+call    0 never executed
+        -:  895:    }
+        -:  896:
+       58:  897:    return NORMAL;
+        -:  898:}
+        -:  899:
+        -:  900:
+function parse_constant called 29 returned 100% blocks executed 46%
+       29:  901:int parse_constant(FILE *fp) {
+       29:  902:    switch (token) {
+branch  0 taken 100%
+branch  1 taken 0%
+branch  2 taken 0%
+branch  3 taken 0%
+       29:  903:        case TNUMBER: // Numeric constants
+       29:  904:            printf("%d", num_attr); // Print the numeric constant
+call    0 returned 100%
+       29:  905:            token = scan(fp); // Move to the next token
+call    0 returned 100%
+       29:  906:            break;
+        -:  907:
+    #####:  908:        case TFALSE: // Boolean false
+        -:  909:        case TTRUE:  // Boolean true
+    #####:  910:            print_token(tokenstr[token], 0); // Print `true` or `false`
+call    0 never executed
+    #####:  911:            token = scan(fp); // Move to the next token
+call    0 never executed
+    #####:  912:            break;
+        -:  913:
+    #####:  914:        case TSTRING: // String constants
+    #####:  915:            printf("'%s'", string_attr); // Print the string constant
+call    0 never executed
+    #####:  916:            token = scan(fp); // Move to the next token
+call    0 never executed
+    #####:  917:            break;
+        -:  918:
+    #####:  919:        default: // If the token doesn't match any constant type
+    #####:  920:            return error("Constant is not found");
+call    0 never executed
+        -:  921:    }
+        -:  922:
+       29:  923:    return NORMAL; // Successfully parsed the constant
+        -:  924:}
+        -:  925:
+function parse_multiplicative_operator called 0 returned 0% blocks executed 0%
+    #####:  926:int parse_multiplicative_operator(FILE *fp) {
+    #####:  927:    switch (token) {
+branch  0 never executed
+branch  1 never executed
+    #####:  928:        case TSTAR:
+        -:  929:        case TDIV:
+        -:  930:        case TAND:
+        -:  931:            //printf("%s ", tokenstr[token]);
+    #####:  932:            print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  933:            token = scan(fp);
+call    0 never executed
+    #####:  934:            break;
+    #####:  935:        default:
+    #####:  936:            return (error("Multiplicative operator is not found"));
+call    0 never executed
+        -:  937:    }
+        -:  938:
+    #####:  939:    return NORMAL;
+        -:  940:}
+        -:  941:
+function parse_additive_operator called 0 returned 0% blocks executed 0%
+    #####:  942:int parse_additive_operator(FILE *fp) {
+    #####:  943:    switch (token) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  944:        case TPLUS:
+        -:  945:           // printf("%s ", tokenstr[token]);
+    #####:  946:            print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  947:            token = scan(fp);
+call    0 never executed
+    #####:  948:            break;
+    #####:  949:        case TMINUS:
+        -:  950:           // printf("%s ", tokenstr[token]);
+    #####:  951:            print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  952:            token = scan(fp);
+call    0 never executed
+    #####:  953:            break;
+    #####:  954:        case TOR:
+        -:  955:            //printf("%s ", tokenstr[token]);
+    #####:  956:            print_token(tokenstr[token], 0);
+call    0 never executed
+    #####:  957:            token = scan(fp);
+call    0 never executed
+    #####:  958:            break;
+    #####:  959:        default:
+    #####:  960:            return (error("Additive operator is not found"));
+call    0 never executed
+        -:  961:    }
+        -:  962:
+    #####:  963:    return NORMAL;
+        -:  964:}
+        -:  965:
+function parse_relational_operator called 14 returned 100% blocks executed 86%
+       14:  966:int parse_relational_operator(FILE *fp) {
+       14:  967:    if (is_relational_operator(token)) {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+       14:  968:        print_token(tokenstr[token], 0);
+call    0 returned 100%
+       14:  969:        token = scan(fp);
+call    0 returned 100%
+       14:  970:        return NORMAL;
+        -:  971:    }
+    #####:  972:    return error("Relational operator is not found");
+call    0 never executed
+        -:  973:}
+        -:  974:
+function parse_input_statement called 1 returned 100% blocks executed 60%
+        1:  975:int parse_input_statement(FILE *fp) {
+        -:  976:    // Print `read` or `readln`
+        1:  977:    print_token(tokenstr[token], 0);
+call    0 returned 100%
+        1:  978:    token = scan(fp);
+call    0 returned 100%
+        -:  979:
+        -:  980:    // Check for optional parentheses
+        1:  981:    if (token == TLPAREN) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  982:        print_token(tokenstr[token], 0); // Print `(`
+call    0 returned 100%
+        1:  983:        token = scan(fp);
+call    0 returned 100%
+        -:  984:
+        -:  985:        // Parse the first variable
+        1:  986:        if (parse_variable(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  987:            return error("Expected a variable in input statement");
+call    0 never executed
+        -:  988:        }
+        -:  989:
+        -:  990:        // Handle subsequent variables separated by commas
+        1:  991:        while (token == TCOMMA) {
+branch  0 taken 0%
+branch  1 taken 100% (fallthrough)
+    #####:  992:            print_token(tokenstr[token], 0); // Print `,`
+call    0 never executed
+    #####:  993:            token = scan(fp);
+call    0 never executed
+        -:  994:
+    #####:  995:            if (parse_variable(fp) == ERROR) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  996:                return error("Expected a variable after ',' in input statement");
+call    0 never executed
+        -:  997:            }
+        -:  998:        }
+        -:  999:
+        -: 1000:        // Ensure the parentheses are closed
+        1: 1001:        if (token != TRPAREN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####: 1002:            return error("Expected ')' to close variable list in input statement");
+call    0 never executed
+        -: 1003:        }
+        1: 1004:        print_token(tokenstr[token], 0); // Print `)` 
+call    0 returned 100%
+        1: 1005:        token = scan(fp);
+call    0 returned 100%
+        -: 1006:    }
+        -: 1007:
+        1: 1008:    return NORMAL;
+        -: 1009:}
+        -: 1010:
+function parse_output_statement called 6 returned 100% blocks executed 75%
+        6: 1011:int parse_output_statement(FILE *fp) {
+        -: 1012:    // Handle `write` or `writeln`
+        6: 1013:    switch (token) {
+branch  0 taken 100%
+branch  1 taken 0%
+        6: 1014:        case TWRITE:
+        -: 1015:        case TWRITELN:
+        6: 1016:            print_token(tokenstr[token], 0); // Print `write` or `writeln`
+call    0 returned 100%
+        6: 1017:            token = scan(fp);
+call    0 returned 100%
+        6: 1018:            break;
+    #####: 1019:        default:
+    #####: 1020:            return error("Expected 'write' or 'writeln' at the beginning of output statement");
+call    0 never executed
+        -: 1021:    }
+        -: 1022:
+        -: 1023:    // Check for optional parentheses
+        6: 1024:    if (token == TLPAREN) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        6: 1025:        printf("%s",tokenstr[token]); // Directly print `(`
+call    0 returned 100%
+        6: 1026:        token = scan(fp);
+call    0 returned 100%
+        -: 1027:
+        -: 1028:        // Parse the first output format
+        6: 1029:        if (parse_output_format(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####: 1030:            return error("Invalid output format in output statement");
+call    0 never executed
+        -: 1031:        }
+        -: 1032:
+        -: 1033:        // Handle subsequent output formats separated by commas
+       11: 1034:        while (token == TCOMMA) {
+branch  0 taken 45%
+branch  1 taken 55% (fallthrough)
+        5: 1035:            print_token(tokenstr[token], 0); // Print `,`
+call    0 returned 100%
+        5: 1036:            token = scan(fp);
+call    0 returned 100%
+        -: 1037:
+        5: 1038:            if (parse_output_format(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####: 1039:                return error("Invalid output format after ',' in output statement");
+call    0 never executed
+        -: 1040:            }
+        -: 1041:        }
+        -: 1042:
+        -: 1043:        // Ensure the parentheses are closed
+        6: 1044:        if (token != TRPAREN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####: 1045:            return error("Expected ')' to close output statement");
+call    0 never executed
+        -: 1046:        }
+        6: 1047:        printf("%s",tokenstr[token]); // Print `)`
+call    0 returned 100%
+        6: 1048:        token = scan(fp);
+call    0 returned 100%
+        -: 1049:    }
+        -: 1050:
+        6: 1051:    return NORMAL; // Successfully parsed
+        -: 1052:}
+        -: 1053:
+function parse_output_format called 11 returned 100% blocks executed 45%
+       11: 1054:int parse_output_format(FILE *fp) {
+       11: 1055:    if (token == TSTRING) { // Handle "文字列"
+branch  0 taken 55% (fallthrough)
+branch  1 taken 45%
+        6: 1056:        if (strlen(string_attr) == 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####: 1057:            return error("Output format string length cannot be 1 unless it is a constant from an expression");
+call    0 never executed
+        -: 1058:        }
+        -: 1059:
+        -: 1060:        // Wrap string in single quotes and print directly
+        6: 1061:        printf("'%s'", string_attr); // Print the quoted string
+call    0 returned 100%
+        6: 1062:        token = scan(fp); // Move to the next token
+call    0 returned 100%
+        6: 1063:        return NORMAL;
+        -: 1064:    }
+        -: 1065:
+        -: 1066:    // Handle "式 [ ':' 符号なし整数 ]"
+        5: 1067:    if (parse_expression(fp) == ERROR) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####: 1068:        return error("Failed to parse expression in output format");
+call    0 never executed
+        -: 1069:    }
+        -: 1070:
+        5: 1071:    if (token == TCOLON) { // Handle optional ':'
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####: 1072:        printf("%s", tokenstr[token]); // Print the colon directly
+call    0 never executed
+    #####: 1073:        token = scan(fp); // Move to the next token
+call    0 never executed
+        -: 1074:
+    #####: 1075:        if (token != TNUMBER) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1076:            return error("Expected an unsigned integer after ':' in output format");
+call    0 never executed
+        -: 1077:        }
+        -: 1078:
+        -: 1079:        // Print the number directly
+    #####: 1080:        printf("%d", num_attr); // Convert number to string and print
+call    0 never executed
+    #####: 1081:        token = scan(fp); // Move to the next token
+call    0 never executed
+        -: 1082:    }
+        -: 1083:
+        5: 1084:    return NORMAL; // Successfully parsed
+        -: 1085:}
+        -: 1086:
+        -: 1087:
+        -: 1088:
+function parse_empty_statement called 0 returned 0% blocks executed 0%
+    #####: 1089:int parse_empty_statement(FILE *fp) {
+        -: 1090:    // An empty statement doesn't print anything or advance the token.
+    #####: 1091:    return NORMAL;  // Indicate successful parsing of an empty statement
+        -: 1092:}
